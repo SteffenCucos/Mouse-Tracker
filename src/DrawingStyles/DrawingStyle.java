@@ -9,6 +9,6 @@ public interface DrawingStyle {
 	
 	void drawPoint(Point point);
 	
-	void saveDrawing() throws IOException;
+	String saveDrawing() throws IOException;
 	
 }

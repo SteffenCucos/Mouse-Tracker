@@ -24,11 +24,14 @@ public abstract class AbstractDrawingStyle implements DrawingStyle {
 		graphics = image.createGraphics();
 	}
 	
-	public void saveDrawing() throws IOException {
-		ImageIO.write(image, "png", new File(FileUtils.outputFilePath + "/" + name + ".png"));
+	public String saveDrawing() throws IOException {
+		String filePath = FileUtils.outputFilePath + "/" + name + ".png";
+		ImageIO.write(image, "png", new File(filePath));
 		graphics.dispose();
 		image.flush();
 		image = null;
+		
+		return filePath;
 	}
 	
 	public void fillCenteredCircle(int x, int y, int r) {

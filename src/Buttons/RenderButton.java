@@ -1,5 +1,7 @@
 package Buttons;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import DrawingStyles.CircleDrawingStyle;
@@ -8,12 +10,17 @@ import DrawingStyles.DrawingStyle;
 import DrawingStyles.InvertedNestedDrawingStyle;
 import DrawingStyles.LineDrawingStyle;
 import DrawingStyles.NestedCircleDrawingStyle;
+
 import Main.FileUtils;
 import Main.Point;
+import Main.RenderWindow;
 import Main.ScreenUtils;
+
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.stage.Stage;
 import javafx.event.ActionEvent;
+import javafx.application.Platform;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -32,7 +39,6 @@ public class RenderButton extends ButtonWithLabel {
 	DrawingStyle nestedCircleDrawingStyle = new NestedCircleDrawingStyle();
 	DrawingStyle invertedNestedDrawingStyle = new InvertedNestedDrawingStyle();
 	
-
 	public RenderButton(Label messageLabel, AtomicBoolean running, ProgressBar progressBar) throws IOException {
 		super(NAME, messageLabel);
 		this.running = running;
@@ -45,6 +51,11 @@ public class RenderButton extends ButtonWithLabel {
 			setLabelMessage("Rendering");
 			renderingThread().start();
     	}
+    }
+    
+    public void renderWindow(List<String> renderPaths) throws Exception {
+		RenderWindow renderWindow = new RenderWindow(renderPaths);
+		renderWindow.start(new Stage());
     }
 	
 	public Thread renderingThread() {
@@ -91,11 +102,21 @@ public class RenderButton extends ButtonWithLabel {
 					}
 				}
 				
-				circleStyle.saveDrawing();
-				lineStyle.saveDrawing();
-				colouredLineStyle.saveDrawing();
-				nestedCircleDrawingStyle.saveDrawing();
-				invertedNestedDrawingStyle.saveDrawing();
+				List<String> renderPaths = new ArrayList<String>() {{
+					add(circleStyle.saveDrawing());
+					add(lineStyle.saveDrawing());
+					add(colouredLineStyle.saveDrawing());
+					add(nestedCircleDrawingStyle.saveDrawing());
+					add(invertedNestedDrawingStyle.saveDrawing());
+				}};
+				
+				Platform.runLater(() -> {
+					try {
+						renderWindow(renderPaths);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
 				
 			} catch(Exception e) {
 				e.printStackTrace();
