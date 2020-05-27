@@ -1,6 +1,5 @@
 package DrawingStyles;
 
-import java.awt.Color;
 import java.io.IOException;
 
 public class InvertedNestedDrawingStyle extends NestedCircleDrawingStyle {
@@ -22,12 +21,7 @@ public class InvertedNestedDrawingStyle extends NestedCircleDrawingStyle {
 	}
 	
 	public int invert(int col) {
-		Color color = new Color(col);
-		return new Color(
-				255 - color.getRed(),
-				255 - color.getGreen(),
-				255 - color.getBlue()
-		).getRGB();
+		return 0xFFFFFF - col;
 	}
 	
 }
