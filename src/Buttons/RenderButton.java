@@ -9,6 +9,7 @@ import DrawingStyles.ColouredLineDrawingStyle;
 import DrawingStyles.DrawingStyle;
 import DrawingStyles.InvertedNestedDrawingStyle;
 import DrawingStyles.LineDrawingStyle;
+import DrawingStyles.NashornDrawingStyle;
 import DrawingStyles.NestedCircleDrawingStyle;
 
 import Main.FileUtils;
@@ -23,6 +24,7 @@ import javafx.event.ActionEvent;
 import javafx.application.Platform;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -33,11 +35,15 @@ public class RenderButton extends ButtonWithLabel {
 	AtomicBoolean running;
 	ProgressBar progressBar;
 	
-	DrawingStyle circleStyle = new CircleDrawingStyle();
-	DrawingStyle lineStyle = new LineDrawingStyle();
-	DrawingStyle colouredLineStyle = new ColouredLineDrawingStyle();
-	DrawingStyle nestedCircleDrawingStyle = new NestedCircleDrawingStyle();
-	DrawingStyle invertedNestedDrawingStyle = new InvertedNestedDrawingStyle();
+	@SuppressWarnings("serial")
+	List<DrawingStyle> drawingStyles = new ArrayList<DrawingStyle>() {{
+		add(new CircleDrawingStyle());
+		add(new LineDrawingStyle());
+		add(new ColouredLineDrawingStyle());
+		add(new NestedCircleDrawingStyle());
+		add(new InvertedNestedDrawingStyle());
+		addAll(NashornDrawingStyle.getCustomDrawingStyles());
+	}};
 	
 	public RenderButton(Label messageLabel, AtomicBoolean running, ProgressBar progressBar) throws IOException {
 		super(NAME, messageLabel);
@@ -60,56 +66,44 @@ public class RenderButton extends ButtonWithLabel {
 	
 	public Thread renderingThread() {
 		Runnable runnable = () -> {
-			final String FILE = FileUtils.outputFilePath + "/points.txt";
+			File pointsFile = FileUtils.getPointsFile();
 			
-			int lines = 0;
-			try(BufferedReader reader = new BufferedReader(new FileReader(FILE))) {
-				while(reader.readLine() != null) {
-					lines++;
-				}
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
-			
+			int lines = FileUtils.getLineCount(pointsFile);
 			int onePercent = lines/100;
 			
-			try(BufferedReader reader = new BufferedReader(new FileReader(FILE))) {
+			try(BufferedReader reader = new BufferedReader(new FileReader(pointsFile))) {
+				Point dimensions = Point.from(reader.readLine());
+				Point offset = Point.from(reader.readLine());
 				
 				int linesRead = 2;
 				progressBar.setProgress(linesRead/lines);
 				
-				Point dimensions = Point.from(reader.readLine());
-				Point offset = Point.from(reader.readLine());
+				NashornDrawingStyle.addNewCustomDrawingStyles(drawingStyles);
 				
-				circleStyle.init(dimensions);
-				lineStyle.init(dimensions);
-				colouredLineStyle.init(dimensions);
-				nestedCircleDrawingStyle.init(dimensions);
-				invertedNestedDrawingStyle.init(dimensions);
+				for(DrawingStyle ds : drawingStyles) {
+					ds.init(dimensions);
+				}
 				
 				Point point = null;
 				while((point = Point.setPoint(point, reader.readLine())) != null) {
 					point = ScreenUtils.renderPoint(point, offset);
-					circleStyle.drawPoint(point);
-					lineStyle.drawPoint(point);
-					colouredLineStyle.drawPoint(point);
-					nestedCircleDrawingStyle.drawPoint(point);
-					invertedNestedDrawingStyle.drawPoint(point);
+					
+					for(DrawingStyle ds : drawingStyles) {
+						ds.drawPoint(point);
+					}
 					
 					linesRead++;
 					if(linesRead % onePercent == 0) {
 						progressBar.setProgress((float)linesRead/(float)lines);
 					}
 				}
+
+				List<String> renderPaths = new ArrayList<String>();
 				
-				List<String> renderPaths = new ArrayList<String>() {{
-					add(circleStyle.saveDrawing());
-					add(lineStyle.saveDrawing());
-					add(colouredLineStyle.saveDrawing());
-					add(nestedCircleDrawingStyle.saveDrawing());
-					add(invertedNestedDrawingStyle.saveDrawing());
-				}};
-				
+				for(DrawingStyle ds : drawingStyles) {
+					renderPaths.add(ds.saveDrawing());
+				}
+
 				Platform.runLater(() -> {
 					try {
 						renderWindow(renderPaths);

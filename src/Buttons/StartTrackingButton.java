@@ -24,13 +24,11 @@ public class StartTrackingButton extends ButtonWithLabel implements AutoCloseabl
 	public StartTrackingButton(Label messageLabel, AtomicBoolean running, ProgressBar progressBar) throws IOException {
 		super(NAME, messageLabel);
 		this.running = running;
-		this.writer = new FileWriter(FileUtils.outputFilePath + "/points.txt");
+		this.writer = new FileWriter(FileUtils.getPointsFile());
 		this.progressBar = progressBar;
 		
-		String dimensions = "(" + ScreenUtils.width + "," + ScreenUtils.height + ")\n";
-		String offset = "(" + ScreenUtils.dx + "," + ScreenUtils.dy + ")\n";
-		writer.write(dimensions);
-		writer.write(offset);
+		writer.write(ScreenUtils.dimensions.toString() + "\n");
+		writer.write(ScreenUtils.offset.toString()+ "\n");
 		writer.flush();
 	}
 
@@ -81,7 +79,7 @@ public class StartTrackingButton extends ButtonWithLabel implements AutoCloseabl
 			writer.write(pointsBuilder.toString());
 			writer.flush();
 		} catch (IOException e) {
-			
+			e.printStackTrace();
 		}
 	}
 

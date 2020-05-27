@@ -9,12 +9,9 @@ import java.util.List;
 
 public class ScreenUtils {
 
-	public static int width = 0;
-	public static int height= 0;
-	
+	public static Point dimensions;
 	// what you have to add to mouse pos to get effective position
-	public static int dx = 0;
-	public static int dy = 0;
+	public static Point offset;
 	
 	static {
 		List<Point> points = new ArrayList<>();
@@ -69,11 +66,14 @@ public class ScreenUtils {
 		System.out.println(topLeft.toString());
 		System.out.println(bottomRight.toString());
 		
-		width = Math.abs(mostLeft - mostRight);
-		height = Math.abs(mostUp - mostDown);
+		int width = Math.abs(mostLeft - mostRight);
+		int height = Math.abs(mostUp - mostDown);
 		
-		dx = Math.abs(mostLeft);
-		dy = Math.abs(mostUp);
+		int dx = Math.abs(mostLeft);
+		int dy = Math.abs(mostUp);
+		
+		dimensions = new Point(width, height);
+		offset = new Point(dx, dy);
 		
 		System.out.println(String.format("width = %s, height = %s, dx = %s, dy = %s", width, height, dx, dy));
 	}

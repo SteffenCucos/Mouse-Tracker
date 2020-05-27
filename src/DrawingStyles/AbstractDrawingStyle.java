@@ -34,6 +34,15 @@ public abstract class AbstractDrawingStyle implements DrawingStyle {
 		return filePath;
 	}
 	
+	@Override 
+	public boolean equals(Object other) {
+		if(!(other instanceof AbstractDrawingStyle)) {
+			return false;
+		}
+		
+		return this.name.equals(((AbstractDrawingStyle)other).name);
+	}
+	
 	public void fillCenteredCircle(int x, int y, int r) {
 		
 		int cx = x - r/2;
