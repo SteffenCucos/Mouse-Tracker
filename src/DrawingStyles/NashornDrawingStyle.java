@@ -6,8 +6,10 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import Main.Point;
 
@@ -16,6 +18,8 @@ public class NashornDrawingStyle extends AbstractDrawingStyle {
 	ScriptEngine nashorn;
 	File sourceFile;
 	String source;
+	
+	Invocable drawPointJS;
 	
 	public NashornDrawingStyle(String name, File sourceFile) {
 		super(name);
@@ -39,14 +43,21 @@ public class NashornDrawingStyle extends AbstractDrawingStyle {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
+		
+		try {
+			nashorn.eval(source);
+		} catch (ScriptException e) {
+			e.printStackTrace();
+		}
+		
+		this.drawPointJS = (Invocable)nashorn;
 	}
 
 	// TODO: add some way of maintaining state between drawPoint calls
 	@Override
 	public void drawPoint(Point point) {
 		try {
-			nashorn.put("point", point);
-			nashorn.eval(source);
+			drawPointJS.invokeFunction("drawPoint", point);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
@@ -63,13 +74,5 @@ public class NashornDrawingStyle extends AbstractDrawingStyle {
 		}
 		
 		return customStyles;
-	}
-	
-	public static void addNewCustomDrawingStyles(List<DrawingStyle> drawingStyles) {
-		for(NashornDrawingStyle customStyle : getCustomDrawingStyles()) {
-			if(!drawingStyles.contains(customStyle)) {
-				drawingStyles.add(customStyle);
-			}
-		}
 	}
 }

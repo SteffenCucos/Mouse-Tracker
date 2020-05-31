@@ -24,14 +24,23 @@ public abstract class AbstractDrawingStyle implements DrawingStyle {
 		graphics = image.createGraphics();
 	}
 	
-	public String saveDrawing() throws IOException {
+	public Thread saveDrawing() throws IOException {
 		String filePath = FileUtils.outputFilePath + "/" + name + ".png";
-		ImageIO.write(image, "png", new File(filePath));
-		graphics.dispose();
-		image.flush();
-		image = null;
 		
-		return filePath;
+		Runnable runnable = () -> {
+			try {
+				ImageIO.write(image, "png", new File(filePath));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			graphics.dispose();
+			image.flush();
+			image = null;
+		};
+		Thread saveThread = new Thread(runnable);
+		saveThread.setName(filePath);
+
+		return saveThread;
 	}
 	
 	@Override 

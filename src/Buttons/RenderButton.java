@@ -35,16 +35,6 @@ public class RenderButton extends ButtonWithLabel {
 	AtomicBoolean running;
 	ProgressBar progressBar;
 	
-	@SuppressWarnings("serial")
-	List<DrawingStyle> drawingStyles = new ArrayList<DrawingStyle>() {{
-		add(new CircleDrawingStyle());
-		add(new LineDrawingStyle());
-		add(new ColouredLineDrawingStyle());
-		add(new NestedCircleDrawingStyle());
-		add(new InvertedNestedDrawingStyle());
-		addAll(NashornDrawingStyle.getCustomDrawingStyles());
-	}};
-	
 	public RenderButton(Label messageLabel, AtomicBoolean running, ProgressBar progressBar) throws IOException {
 		super(NAME, messageLabel);
 		this.running = running;
@@ -59,11 +49,6 @@ public class RenderButton extends ButtonWithLabel {
     	}
     }
     
-    public void renderWindow(List<String> renderPaths) throws Exception {
-		RenderWindow renderWindow = new RenderWindow(renderPaths);
-		renderWindow.start(new Stage());
-    }
-	
 	public Thread renderingThread() {
 		Runnable runnable = () -> {
 			File pointsFile = FileUtils.getPointsFile();
@@ -77,8 +62,16 @@ public class RenderButton extends ButtonWithLabel {
 				
 				int linesRead = 2;
 				progressBar.setProgress(linesRead/lines);
-				
-				NashornDrawingStyle.addNewCustomDrawingStyles(drawingStyles);
+					
+				@SuppressWarnings("serial")
+				List<DrawingStyle> drawingStyles = new ArrayList<DrawingStyle>() {{
+					add(new CircleDrawingStyle());
+					add(new LineDrawingStyle());
+					add(new ColouredLineDrawingStyle());
+					add(new NestedCircleDrawingStyle());
+					add(new InvertedNestedDrawingStyle());
+					addAll(NashornDrawingStyle.getCustomDrawingStyles());
+				}};
 				
 				for(DrawingStyle ds : drawingStyles) {
 					ds.init(dimensions);
@@ -97,24 +90,17 @@ public class RenderButton extends ButtonWithLabel {
 						progressBar.setProgress((float)linesRead/(float)lines);
 					}
 				}
-
-				List<String> renderPaths = new ArrayList<String>();
 				
-				for(DrawingStyle ds : drawingStyles) {
-					renderPaths.add(ds.saveDrawing());
-				}
-
 				Platform.runLater(() -> {
 					try {
-						renderWindow(renderPaths);
+						RenderWindow.buildRenderWindow(drawingStyles, dimensions);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				});
-				
-			} catch(Exception e) {
+			} catch(IOException e) {
 				e.printStackTrace();
-			}
+			} 
 		};
 		
 		Thread renderThread = new Thread(runnable);
