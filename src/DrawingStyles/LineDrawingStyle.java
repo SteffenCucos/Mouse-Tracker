@@ -13,7 +13,7 @@ public class LineDrawingStyle extends AbstractDrawingStyle {
 	}
 	
 	@Override
-	public void init(Point dimensions) {
+	public void init(Point dimensions) throws DrawingStyleInstantiationException {
 		super.init(dimensions);
 		graphics.setColor(Color.WHITE);
 		graphics.fillRect (0, 0, image.getWidth(), image.getHeight());
@@ -21,7 +21,7 @@ public class LineDrawingStyle extends AbstractDrawingStyle {
 	}
 	
 	@Override
-	public void drawPoint(Point point) {
+	public void drawPoint(Point point) throws DrawPointException {
 		if(point.equals(prevPoint)) {
 			if(multiplier > 20) {
 				multiplier *= 1.005;

@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import DrawingStyles.DrawingStyle.DrawingStyleInstantiationException;
 import Main.FileUtils;
 import Main.Point;
 
@@ -19,28 +20,26 @@ public abstract class AbstractDrawingStyle implements DrawingStyle {
 		this.name = name;
 	}
 	
-	public void init(Point dimensions) {
+	public String getName() {
+		return this.name;
+	}
+	
+	public String getFilePath() {
+		return FileUtils.getImageFilePath(this.name);
+	}
+	
+	public void init(Point dimensions) throws DrawingStyleInstantiationException {
 		image = new BufferedImage(dimensions.x, dimensions.y, BufferedImage.TYPE_INT_RGB);
 		graphics = image.createGraphics();
 	}
 	
-	public Thread saveDrawing() throws IOException {
-		String filePath = FileUtils.outputFilePath + "/" + name + ".png";
+	public void saveDrawing() throws IOException {
+		String filePath = getFilePath();
 		
-		Runnable runnable = () -> {
-			try {
-				ImageIO.write(image, "png", new File(filePath));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			graphics.dispose();
-			image.flush();
-			image = null;
-		};
-		Thread saveThread = new Thread(runnable);
-		saveThread.setName(filePath);
-
-		return saveThread;
+		ImageIO.write(image, "png", new File(filePath));
+		graphics.dispose();
+		image.flush();
+		image = null;
 	}
 	
 	@Override 

@@ -10,14 +10,14 @@ public class InvertedNestedDrawingStyle extends NestedCircleDrawingStyle {
 	}
 
 	@Override
-	public Thread saveDrawing() throws IOException {
+	public void saveDrawing() throws IOException {
 		for(int x = 0; x < image.getWidth(); x++) {
 			for(int y = 0; y < image.getHeight(); y++) {
 				image.setRGB(x, y, invert(image.getRGB(x,y)));
 			}
 		}
 		
-		return super.saveDrawing();
+		super.saveDrawing();
 	}
 	
 	public int invert(int col) {

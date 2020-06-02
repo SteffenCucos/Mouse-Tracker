@@ -17,7 +17,7 @@ public class NestedCircleDrawingStyle extends AbstractDrawingStyle {
 	}
 	
 	@Override
-	public void init(Point dimensions) {
+	public void init(Point dimensions) throws DrawingStyleInstantiationException {
 		super.init(dimensions);
 		graphics.setColor(Color.WHITE);
 		graphics.fillRect (0, 0, image.getWidth(), image.getHeight());
@@ -25,7 +25,7 @@ public class NestedCircleDrawingStyle extends AbstractDrawingStyle {
 	}
 	
 	@Override
-	public void drawPoint(Point point) {
+	public void drawPoint(Point point) throws DrawPointException {
 		if(point.equals(prevPoint)) {
 			run++;
 		} else {
@@ -35,7 +35,7 @@ public class NestedCircleDrawingStyle extends AbstractDrawingStyle {
 				}
 			} else {
 				multiplier = getMultiplier(run);
-				System.out.println("run of " + run + " multiplier = " + multiplier);
+				//System.out.println("run of " + run + " multiplier = " + multiplier);
 				fillCenteredCircle(point.x, point.y, 4);
 				graphics.setColor(TRANSPARENT);
 				fillCenteredCircle(prevPoint.x, prevPoint.y, 1*(int)multiplier);

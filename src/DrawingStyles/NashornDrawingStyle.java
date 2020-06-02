@@ -11,6 +11,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import DrawingStyles.DrawingStyle.DrawingStyleInstantiationException;
 import Main.Point;
 
 public class NashornDrawingStyle extends AbstractDrawingStyle {
@@ -27,7 +28,7 @@ public class NashornDrawingStyle extends AbstractDrawingStyle {
 	}
 	
 	@Override
-	public void init(Point dimensions) {
+	public void init(Point dimensions) throws DrawingStyleInstantiationException {
 		super.init(dimensions);
 
 		this.nashorn = new ScriptEngineManager().getEngineByName("nashorn"); 
@@ -53,13 +54,12 @@ public class NashornDrawingStyle extends AbstractDrawingStyle {
 		this.drawPointJS = (Invocable)nashorn;
 	}
 
-	// TODO: add some way of maintaining state between drawPoint calls
 	@Override
-	public void drawPoint(Point point) {
+	public void drawPoint(Point point) throws DrawPointException {
 		try {
 			drawPointJS.invokeFunction("drawPoint", point);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new DrawPointException(e.getMessage());
 		} 
 	}
 	
