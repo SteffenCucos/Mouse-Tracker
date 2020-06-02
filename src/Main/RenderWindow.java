@@ -11,6 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -35,18 +36,30 @@ public class RenderWindow extends Application {
 	Button left;
 	Button right;
 	
+	public static Thread buildSaveThread(DrawingStyle ds) {
+		Thread saveThread = new Thread(() -> {
+			try {
+				ds.saveDrawing();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+		saveThread.setName(ds.getName());
+		return saveThread;
+	}
+	
 	public static void buildRenderWindow(List<DrawingStyle> drawingStyles, Point dimensions) throws Exception {
 		RenderWindow renderWindow = new RenderWindow(drawingStyles.size(), dimensions);
 		renderWindow.start(new Stage());
 		
-		Platform.runLater(() -> {
+		Thread loadGUIDependenciesThread = new Thread(() -> {
 			try {
 				List<Thread> renderThreads = new ArrayList<>();
 				List<String> renderPaths = new ArrayList<>();
 				for(DrawingStyle ds : drawingStyles) {
-					Thread renderThread = ds.saveDrawing();
+					Thread renderThread = buildSaveThread(ds);
 					renderThreads.add(renderThread);
-					renderPaths.add(renderThread.getName());
+					renderPaths.add(ds.getFilePath());
 					renderThread.start();
 				}
 				
@@ -55,12 +68,18 @@ public class RenderWindow extends Application {
 				}
 				
 				renderWindow.setRenders(renderPaths);
-				renderWindow.drawRender();
-				renderWindow.setButtons(true);
-			} catch(Exception e) {
+				
+				Platform.runLater(() -> {
+					renderWindow.drawRender();
+					renderWindow.setButtons(true);
+				});
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		});
+		
+		loadGUIDependenciesThread.setName("Loading Images");
+		loadGUIDependenciesThread.start();
 	}
 	
 	private RenderWindow(int numRenders, Point dimensions) {
