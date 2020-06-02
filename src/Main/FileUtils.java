@@ -35,6 +35,10 @@ public class FileUtils {
 		}
 	}
 	
+	public static String getImageFilePath(String imageName) {
+		return outputFilePath + "/" + imageName + ".png";
+	}
+	
 	public static File getPointsFile() {
 		return new File(outputFilePath + "/points.txt");
 	}

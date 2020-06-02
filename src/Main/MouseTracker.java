@@ -29,9 +29,14 @@ public class MouseTracker extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		final ProgressBar progressBar = new ProgressBar(0);
-        Button startButton = new StartTrackingButton(messageLabel, running, progressBar); 
-        Button stopButton = new StopTrackingButton(messageLabel, running); 
-        Button renderButton = new RenderButton(messageLabel, running, progressBar);
+		
+        ButtonHandler buttonHandler = new ButtonHandler();
+		
+        Button startButton = new StartTrackingButton(messageLabel, running, buttonHandler, progressBar); 
+        Button stopButton = new StopTrackingButton(messageLabel, running, buttonHandler); 
+        Button renderButton = new RenderButton(messageLabel, running, buttonHandler, progressBar);
+        
+        buttonHandler.init(startButton, stopButton, renderButton);
         
         // Create the HBox
         HBox buttonBox = new HBox();
@@ -57,4 +62,47 @@ public class MouseTracker extends Application {
         stage.setTitle("Screen Heat Map");
         stage.show();
     }
+	
+	
+	public static class ButtonHandler {
+		Button startButton;
+		Button stopButton;
+		Button renderButton;
+		
+		public void init(Button startButton, Button stopButton, Button renderButton) {
+			this.startButton = startButton;
+			this.stopButton = stopButton;
+			this.renderButton = renderButton;
+			enableAll();
+			this.stopButton.setDisable(true);
+		}
+		
+		public void enableAll() {
+			startButton.setDisable(false);
+			stopButton.setDisable(false);
+			renderButton.setDisable(false);
+		}
+		
+		public void pressButton(Button button) {
+			enableAll();
+			if(button == startButton) {
+				startButton.setDisable(true);
+				renderButton.setDisable(true);
+			} else if(button ==  stopButton) {
+				stopButton.setDisable(true);
+				renderButton.setDisable(true);
+			} else {
+				startButton.setDisable(true);
+				stopButton.setDisable(true);
+				renderButton.setDisable(true);
+			}
+		}
+		
+		public void renderFinsish() {
+			enableAll();
+			stopButton.setDisable(true);
+		}
+		
+		
+	}
 }

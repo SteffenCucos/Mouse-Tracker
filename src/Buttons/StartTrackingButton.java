@@ -3,6 +3,7 @@ package Buttons;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import Main.FileUtils;
+import Main.MouseTracker.ButtonHandler;
 import Main.Point;
 import Main.ScreenUtils;
 import javafx.event.ActionEvent;
@@ -18,13 +19,15 @@ public class StartTrackingButton extends ButtonWithLabel implements AutoCloseabl
 	
 	static final String NAME = "Start";
 	AtomicBoolean running;
+	ButtonHandler buttonHandler;
 	ProgressBar progressBar;
 	FileWriter writer;
 	
-	public StartTrackingButton(Label messageLabel, AtomicBoolean running, ProgressBar progressBar) throws IOException {
+	public StartTrackingButton(Label messageLabel, AtomicBoolean running, ButtonHandler buttonHandler, ProgressBar progressBar) throws IOException {
 		super(NAME, messageLabel);
 		this.running = running;
 		this.writer = new FileWriter(FileUtils.getPointsFile());
+		this.buttonHandler = buttonHandler;
 		this.progressBar = progressBar;
 		
 		writer.write(ScreenUtils.dimensions.toString() + "\n");
@@ -34,6 +37,7 @@ public class StartTrackingButton extends ButtonWithLabel implements AutoCloseabl
 
     @Override 
     public void handle(ActionEvent event) {
+    	buttonHandler.pressButton(this);
     	if(!running.get()) {
     		running.set(true);
     		progressBar.setProgress(0);
