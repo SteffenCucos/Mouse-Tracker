@@ -3,10 +3,13 @@ package Buttons;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import DrawingStyles.CircleDrawingStyle;
 import DrawingStyles.ColouredLineDrawingStyle;
 import DrawingStyles.DrawingStyle;
+import DrawingStyles.DrawingStyle.DrawPointException;
+import DrawingStyles.DrawingStyle.DrawingStyleInstantiationException;
 import DrawingStyles.InvertedNestedDrawingStyle;
 import DrawingStyles.LineDrawingStyle;
 import DrawingStyles.NashornDrawingStyle;
@@ -16,10 +19,9 @@ import Main.FileUtils;
 import Main.Point;
 import Main.RenderWindow;
 import Main.ScreenUtils;
-
+import Main.MouseTracker.ButtonHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.application.Platform;
 
@@ -33,78 +35,124 @@ public class RenderButton extends ButtonWithLabel {
 	
 	static final String NAME = "Render";
 	AtomicBoolean running;
+	ButtonHandler buttonHandler;
 	ProgressBar progressBar;
 	
-	public RenderButton(Label messageLabel, AtomicBoolean running, ProgressBar progressBar) throws IOException {
+	public RenderButton(Label messageLabel, AtomicBoolean running, ButtonHandler buttonHandler, ProgressBar progressBar) throws IOException {
 		super(NAME, messageLabel);
 		this.running = running;
+		this.buttonHandler = buttonHandler;
 		this.progressBar = progressBar;
 	}
 
     @Override 
     public void handle(ActionEvent event) {
+    	buttonHandler.pressButton(this);
     	if(!running.get()) {
 			setLabelMessage("Rendering");
-			renderingThread().start();
+			renderMarshallingThread().start();
     	}
     }
     
-	public Thread renderingThread() {
-		Runnable runnable = () -> {
+    public static class RenderingTask {
+    	Thread task;
+    	AtomicInteger linesDone;
+    	DrawingStyle drawingStyle;
+    	File pointsFile;
+    	
+    	public RenderingTask(DrawingStyle drawingStyle, File pointsFile) {
+    		this.drawingStyle = drawingStyle;
+    		this.pointsFile = pointsFile;
+    		this.linesDone = new AtomicInteger(0);
+    		this.task =  new Thread(() -> {
+            	try(BufferedReader reader = new BufferedReader(new FileReader(pointsFile))) {
+        			Point dimensions = Point.from(reader.readLine());
+        			Point offset = Point.from(reader.readLine());
+        			
+        			linesDone.set(2);
+            		
+        			drawingStyle.init(dimensions);
+            		
+            		Point point = null;
+        			while((point = Point.setPoint(point, reader.readLine())) != null) {
+        				point = ScreenUtils.renderPoint(point, offset);
+        				drawingStyle.drawPoint(point);
+            			linesDone.getAndIncrement();
+        			}
+            	} catch (IOException | DrawingStyleInstantiationException | DrawPointException e) {
+    				e.printStackTrace();
+    			}
+        	}) {{
+        		setName("Rendering: " + drawingStyle.getName());
+        	}};
+    	}
+    	
+    	public static int getTotalLinesDone(List<RenderingTask> renderingTasks) {
+    		return renderingTasks.stream().mapToInt(rt -> rt.linesDone.get()).sum();
+    	}
+    	
+    	public static boolean allTasksFinished(List<RenderingTask> renderingTasks) {
+    		boolean done = true;
+    		for(RenderingTask renderingTask : renderingTasks) {
+    			done &= !renderingTask.task.isAlive();
+    		}
+    		
+    		return done;
+    	}
+    }
+    
+    
+	@SuppressWarnings("serial")
+	public Thread renderMarshallingThread() {
+		return new Thread(() -> {
 			File pointsFile = FileUtils.getPointsFile();
+
+			List<DrawingStyle> drawingStyles = new ArrayList<DrawingStyle>() {{
+				add(new CircleDrawingStyle());
+				add(new LineDrawingStyle());
+				add(new ColouredLineDrawingStyle());
+				add(new NestedCircleDrawingStyle());
+				add(new InvertedNestedDrawingStyle());
+				addAll(NashornDrawingStyle.getCustomDrawingStyles());
+			}};
 			
-			int lines = FileUtils.getLineCount(pointsFile);
+			List<RenderingTask> renderingTasks = new ArrayList<RenderingTask>() {{
+				for(DrawingStyle ds : drawingStyles) {
+					add(new RenderingTask(ds, pointsFile));
+				}
+			}};
+			
+			int lines = renderingTasks.size() * FileUtils.getLineCount(pointsFile);
 			int onePercent = lines/100;
 			
-			try(BufferedReader reader = new BufferedReader(new FileReader(pointsFile))) {
-				Point dimensions = Point.from(reader.readLine());
-				Point offset = Point.from(reader.readLine());
-				
-				int linesRead = 2;
-				progressBar.setProgress(linesRead/lines);
-					
-				@SuppressWarnings("serial")
-				List<DrawingStyle> drawingStyles = new ArrayList<DrawingStyle>() {{
-					add(new CircleDrawingStyle());
-					add(new LineDrawingStyle());
-					add(new ColouredLineDrawingStyle());
-					add(new NestedCircleDrawingStyle());
-					add(new InvertedNestedDrawingStyle());
-					addAll(NashornDrawingStyle.getCustomDrawingStyles());
-				}};
-				
-				for(DrawingStyle ds : drawingStyles) {
-					ds.init(dimensions);
+			for(RenderingTask renderingTask : renderingTasks) {
+				renderingTask.task.start();
+			}
+			
+			int previous = 0;
+			while(!RenderingTask.allTasksFinished(renderingTasks)) {
+				int current = RenderingTask.getTotalLinesDone(renderingTasks);
+				if(current - previous > onePercent) {
+					progressBar.setProgress((float)current/(float)lines);
+					previous = current;
 				}
-				
-				Point point = null;
-				while((point = Point.setPoint(point, reader.readLine())) != null) {
-					point = ScreenUtils.renderPoint(point, offset);
-					
-					for(DrawingStyle ds : drawingStyles) {
-						ds.drawPoint(point);
-					}
-					
-					linesRead++;
-					if(linesRead % onePercent == 0) {
-						progressBar.setProgress((float)linesRead/(float)lines);
-					}
-				}
-				
-				Platform.runLater(() -> {
-					try {
+			}
+			
+			progressBar.setProgress(1);
+			
+			Platform.runLater(() -> {
+				try {
+					buttonHandler.renderFinsish();
+					try(BufferedReader reader = new BufferedReader(new FileReader(pointsFile))) {
+						Point dimensions = Point.from(reader.readLine());
 						RenderWindow.buildRenderWindow(drawingStyles, dimensions);
-					} catch (Exception e) {
-						e.printStackTrace();
 					}
-				});
-			} catch(IOException e) {
-				e.printStackTrace();
-			} 
-		};
-		
-		Thread renderThread = new Thread(runnable);
-		renderThread.setName("Render Thread");
-		return renderThread;
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+		}) {{
+			setName("Render Marshalling Thread");
+		}};
 	}
 }
