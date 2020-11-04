@@ -37,15 +37,15 @@ public class RenderWindow extends Application {
 	Button right;
 	
 	public static Thread buildSaveThread(DrawingStyle ds) {
-		Thread saveThread = new Thread(() -> {
+		return new Thread(() -> {
 			try {
 				ds.saveDrawing();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		});
-		saveThread.setName(ds.getName());
-		return saveThread;
+		}) {{
+			setName(ds.getName());
+		}};
 	}
 	
 	public static void buildRenderWindow(List<DrawingStyle> drawingStyles, Point dimensions) throws Exception {
