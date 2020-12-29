@@ -49,11 +49,19 @@ public class MouseTracker extends Application {
         root.setSpacing(15);
         root.setStyle(
         		"-fx-padding: 10;" +
-                "-fx-border-style: solid inside;" +
-                "-fx-border-width: 2;" +
-                "-fx-border-insets: 5;" +
-                "-fx-border-radius: 5;" +
-                "-fx-border-color: blue;"
+                "-fx-base: #3f474f;\r\n" + 
+                "    -fx-accent: #e7eff7 ;\r\n" + 
+                "    -fx-default-button: #7f878f ;\r\n" + 
+                "    -fx-focus-color: #efefef;\r\n" + 
+                "    -fx-faint-focus-color: #efefef22;\r\n" + 
+                "    -fx-focused-text-base-color : ladder(\r\n" + 
+                "            -fx-selection-bar,\r\n" + 
+                "            -fx-light-text-color 45%,\r\n" + 
+                "            -fx-dark-text-color 46%,\r\n" + 
+                "            -fx-dark-text-color 59%,\r\n" + 
+                "            -fx-mid-text-color 60%\r\n" + 
+                "        );\r\n" + 
+                "    -fx-focused-mark-color : -fx-focused-text-base-color "
         );
          
         // Create the Scene
