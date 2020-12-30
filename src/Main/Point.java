@@ -18,6 +18,11 @@ public class Point {
 		return setPoint(new Point(), pointStr);
 	}
 	
+	public static void setPoint(Point point, java.awt.Point awtPoint) {
+		point.x = awtPoint.x;
+		point.y = awtPoint.y;
+	}
+	
 	public static Point setPoint(Point point, Point other) {
 		if(point == null) {
 			point = new Point();

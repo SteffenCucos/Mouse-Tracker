@@ -1,89 +1,62 @@
 package Main;
 
-import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.control.Button;
-import javafx.stage.Stage;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
-import javafx.scene.Scene;
 import javafx.scene.paint.Color;
 
-import java.io.IOException;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import Buttons.ArrowButton;
 import Buttons.ArrowButton.Direction;
+import DrawingStyles.AbstractDrawingStyle;
 import DrawingStyles.DrawingStyle;
 
+import javafx.scene.image.ImageView;
 
 @SuppressWarnings("restriction")
-public class RenderWindow extends Application {
+public class RenderWindow extends HBox {
 
 	AtomicInteger index = new AtomicInteger(0);
-	GraphicsContext context;
-	List<Image> renders = new ArrayList<>();
-	Stage stage;
+	List<BufferedImage> renders = new ArrayList<>();
+	ImageView imageView = new ImageView();
 	
-	int numRenders;
 	double width;
 	double height;
 	
 	Button left;
 	Button right;
 	
-	public static Thread buildSaveThread(DrawingStyle ds) {
-		return new Thread(() -> {
-			try {
-				ds.saveDrawing();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}) {{
-			setName(ds.getName());
-		}};
+	public static Point computePreservedSize(Point boundingBox, Point dimensions) {
+		double width;
+		double height;
+		
+		double dimensionsWidthHeightRatio = (double)dimensions.x / dimensions.y;
+		
+		
+
+		//scaling factor	
+		double vScale = (double)boundingBox.y/dimensions.y;
+		double hScale = (double)boundingBox.x/dimensions.x;
+
+		double scalingFactor = Math.min(vScale, hScale);
+		
+		System.out.println(boundingBox.toString() + " + " + dimensions.toString() + " -> " + new Point((int)(dimensions.x * scalingFactor), (int)(dimensions.y * scalingFactor)));
+		
+		return new Point((int)(dimensions.x * scalingFactor), (int)(dimensions.y * scalingFactor));
 	}
 	
-	public static void buildRenderWindow(List<DrawingStyle> drawingStyles, Point dimensions) throws Exception {
-		RenderWindow renderWindow = new RenderWindow(drawingStyles.size(), dimensions);
-		renderWindow.start(new Stage());
-		
-		Thread loadGUIDependenciesThread = new Thread(() -> {
-			try {
-				List<Thread> renderThreads = new ArrayList<>();
-				List<String> renderPaths = new ArrayList<>();
-				for(DrawingStyle ds : drawingStyles) {
-					Thread renderThread = buildSaveThread(ds);
-					renderThreads.add(renderThread);
-					renderPaths.add(ds.getFilePath());
-					renderThread.start();
-				}
-				
-				for(Thread renderThread : renderThreads) {
-					renderThread.join();
-				}
-				
-				renderWindow.setRenders(renderPaths);
-				
-				Platform.runLater(() -> {
-					renderWindow.drawRender();
-					renderWindow.setButtons(true);
-				});
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
-		
-		loadGUIDependenciesThread.setName("Loading Images");
-		loadGUIDependenciesThread.start();
-	}
-	
-	private RenderWindow(int numRenders, Point dimensions) {
-		this.numRenders = numRenders;
+	public static RenderWindow buildRenderWindow(List<DrawingStyle> drawingStyles, Point dimensions) throws Exception {
+		double width;
+		double height;
 		
 		if(dimensions.x >= dimensions.y) {
 			double ratio = (double)dimensions.x / 800;
@@ -94,6 +67,73 @@ public class RenderWindow extends Application {
 			height = 800;
 			width = (dimensions.x / ratio);
 		}
+		
+		Point preservedDimensions = computePreservedSize(new Point(800,800), dimensions);
+		
+		List<BufferedImage> renders = drawingStyles
+				.stream()
+				.map(ds -> (AbstractDrawingStyle)ds)
+				.map(ads -> ads.image)
+				.collect(Collectors.toList());
+		
+		RenderWindow renderWindow = new RenderWindow(renders, preservedDimensions.x, preservedDimensions.y, dimensions);
+		
+		return renderWindow;
+	}
+	
+	private RenderWindow(List<BufferedImage> renders, double width, double height, Point imageDimensions) {
+		this.renders = renders;
+		
+		int start = 0;
+		int end = renders.size() - 1;
+
+		this.left = new ArrowButton("<", Direction.LEFT, start, end, index, this);
+		this.right = new ArrowButton(">", Direction.RIGHT, start, end, index, this);
+
+		this.getChildren().addAll(left, imageView, right);
+		this.setSpacing(10);
+
+		this.setAlignment(javafx.geometry.Pos.CENTER);
+        
+		imageView.setPreserveRatio(true);
+		imageView.setFitWidth(width);
+		imageView.setFitHeight(height);
+		
+		this.heightProperty().addListener(new ChangeListener<Object>() {
+			public void changed(ObservableValue<?> observable, Object oldValue, Object newValue) {
+//				Point newDimensions = computePreservedSize(
+//						new Point((int)that.getWidth(), ((Double)newValue).intValue()),
+//						imageDimensions);
+//				
+//				imageView.setFitWidth(newDimensions.x - 100);
+//				imageView.setFitHeight(newDimensions.y - 100);
+				imageView.setFitHeight((double) newValue - 20);
+			}
+  		});
+		
+		this.widthProperty().addListener(new ChangeListener<Object>() {
+    	  public void changed(ObservableValue<?> observable, Object oldValue, Object newValue) {
+//				Point newDimensions = computePreservedSize(
+//						new Point(((Double)newValue).intValue(), (int)that.getHeight()),
+//						imageDimensions);
+//				
+//				imageView.setFitWidth(newDimensions.x - 100);
+//				imageView.setFitHeight(newDimensions.y - 100);
+    		  imageView.setFitWidth((double) newValue - 100);
+			}
+  		});
+		
+
+		
+		
+		setButtons(true);
+		drawRender();
+	}
+	
+	public void drawRender() {
+		BufferedImage bufferedImage = renders.get(index.get());
+		Image image = javafx.embed.swing.SwingFXUtils.toFXImage(bufferedImage, null);
+		imageView.setImage(image);
 	}
 	
 	public void setButtons(boolean enabled) {
@@ -106,51 +146,8 @@ public class RenderWindow extends Application {
 			System.out.println("Loading: " + path);
 			String imagePath = "file:" + path;
 			Image image = new Image(imagePath, width, height, true, true);
-			renders.add(image);
+			//renders.add(image);
 		});
 	}
 	
-	@Override
-	public void start(Stage stage) throws Exception {
-		this.stage = stage;
-		
-		int start = 0;
-		int end = numRenders - 1;
-
-		Button left = new ArrowButton("<", Direction.LEFT, start, end, index, this);
-		Button right = new ArrowButton(">", Direction.RIGHT, start, end, index, this);
-		this.left = left;
-		this.right = right;
-		setButtons(false);
-		
-		Canvas canvas = new Canvas(width, height);
-		GraphicsContext gc = canvas.getGraphicsContext2D();
-		gc.setFill(Color.TRANSPARENT);
-		gc.fillRect(0,0,(int)width,(int)height);
-		this.context = gc;
-
-		HBox root = new HBox();
-		root.getChildren().addAll(left, canvas, right);
-		root.setSpacing(10);
-        root.setStyle(
-        		"-fx-padding: 10;" +
-                "-fx-border-style: solid inside;" +
-                "-fx-border-width: 2;" +
-                "-fx-border-insets: 5;" +
-                "-fx-border-radius: 5;" +
-                "-fx-border-color: blue;"
-        );
-        root.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-		
-		Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-	}
-	
-	@SuppressWarnings("deprecation")
-	public void drawRender() {
-		Image render = renders.get(index.get());
-		stage.setTitle(render.impl_getUrl());
-		context.drawImage(render, 0, 0);
-	}
 }

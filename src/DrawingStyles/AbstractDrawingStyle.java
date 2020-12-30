@@ -12,7 +12,7 @@ import Main.Point;
 
 public abstract class AbstractDrawingStyle implements DrawingStyle {
 	
-	BufferedImage image;
+	public BufferedImage image;
 	Graphics2D graphics;
 	String name;
 	

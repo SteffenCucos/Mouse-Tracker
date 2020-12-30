@@ -1,38 +1,33 @@
 package Buttons;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import Main.FileUtils;
+import Main.FileTracker;
 import Main.MouseTracker.ButtonHandler;
 import Main.Point;
-import Main.ScreenUtils;
+import Main.Tracker;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 
 import java.awt.MouseInfo;
-import java.io.FileWriter;
-import java.io.IOException;
 
 @SuppressWarnings("restriction")
-public class StartTrackingButton extends ButtonWithLabel implements AutoCloseable {
+public class StartTrackingButton extends ButtonWithLabel {
 	
 	static final String NAME = "Start";
 	AtomicBoolean running;
 	ButtonHandler buttonHandler;
-	ProgressBar progressBar;
-	FileWriter writer;
 	
-	public StartTrackingButton(Label messageLabel, AtomicBoolean running, ButtonHandler buttonHandler, ProgressBar progressBar) throws IOException {
+	List<Tracker> trackers;
+
+	
+	public StartTrackingButton(Label messageLabel, AtomicBoolean running, ButtonHandler buttonHandler, List<Tracker> trackers) {
 		super(NAME, messageLabel);
 		this.running = running;
-		this.writer = new FileWriter(FileUtils.getPointsFile());
 		this.buttonHandler = buttonHandler;
-		this.progressBar = progressBar;
-		
-		writer.write(ScreenUtils.dimensions.toString() + "\n");
-		writer.write(ScreenUtils.offset.toString()+ "\n");
-		writer.flush();
+		this.trackers = trackers;
 	}
 
     @Override 
@@ -40,7 +35,6 @@ public class StartTrackingButton extends ButtonWithLabel implements AutoCloseabl
     	buttonHandler.pressButton(this);
     	if(!running.get()) {
     		running.set(true);
-    		progressBar.setProgress(0);
     		setLabelMessage("Started");
 			trackingThread().start();
     	}
@@ -49,24 +43,24 @@ public class StartTrackingButton extends ButtonWithLabel implements AutoCloseabl
 	public Thread trackingThread() {
 		Runnable runnable = () -> {
 			System.out.println("Started running");
-			StringBuilder pointsBuilder = new StringBuilder();
-			int pointsInBatch = 0;
+			
+			Point point = new Point();
+			
 			try {
 				while(running.get()) {
 					Thread.sleep(3);
-
-					pointsBuilder.append(Point.stringFrom(MouseInfo.getPointerInfo().getLocation()) + "\n");
-					pointsInBatch++;
+					Point.setPoint(point, MouseInfo.getPointerInfo().getLocation());
 					
-					if(pointsInBatch >= 2000) {
-						writePoints(pointsBuilder);
-						pointsBuilder.setLength(0);
-						pointsInBatch = 0;
+					for(Tracker tracker: trackers) {
+						tracker.consumePoint(point);
 					}
 				}
 				
+				for(Tracker tracker: trackers) {
+					tracker.flush();
+				}
+				
 				System.out.println("Stopped running");
-				writePoints(pointsBuilder);
 			} catch (InterruptedException e) {
 
 			}
@@ -76,19 +70,5 @@ public class StartTrackingButton extends ButtonWithLabel implements AutoCloseabl
 		Thread trackingThread = new Thread(runnable);
 		trackingThread.setName("Tracking Thread");
 		return trackingThread;
-	}
-	
-	public void writePoints(StringBuilder pointsBuilder) {
-		try {
-			writer.write(pointsBuilder.toString());
-			writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void close() throws Exception {		
-		this.writer.close();
 	}
 }
