@@ -96,7 +96,7 @@ public class MouseTracker extends Application {
         new Thread(() -> {
 			while(true) {
 				try {
-					Thread.sleep(100);
+					Thread.sleep(1);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -138,6 +138,7 @@ public class MouseTracker extends Application {
             	    int priority = t.getPriority();
             	    String type = t.isDaemon() ? "Daemon" : "Normal";
             	    System.out.printf("%-20s \t %s \t %d \t %s\n", name, state, priority, type);
+            	    t.interrupt();
             	}
             }
         });  
@@ -145,7 +146,6 @@ public class MouseTracker extends Application {
         
         stage.show();
     }
-	
 	
 	public static class ButtonHandler {
 		Button startButton;

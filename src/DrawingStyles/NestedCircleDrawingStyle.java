@@ -1,4 +1,5 @@
 package DrawingStyles;
+
 import java.awt.Color;
 
 import Main.Point;
