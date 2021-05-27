@@ -127,6 +127,9 @@ public class MouseTracker extends Application {
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setTitle("Screen Heat Map");
+        stage.getIcons().add(
+        		FileUtils.getResourceImage("hotmouse3.png")
+        );
         
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {

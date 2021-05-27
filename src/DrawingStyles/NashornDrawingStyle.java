@@ -11,7 +11,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import DrawingStyles.DrawingStyle.DrawingStyleInstantiationException;
 import Main.Point;
 
 public class NashornDrawingStyle extends AbstractDrawingStyle {

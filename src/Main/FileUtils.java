@@ -4,11 +4,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import javafx.scene.image.Image;
 
 import java.text.SimpleDateFormat;
 
 import java.util.Date;
 
+@SuppressWarnings("restriction")
 public class FileUtils {
 
 	public static String outputFilePath;
@@ -21,7 +23,15 @@ public class FileUtils {
 		String datePrefix = getDatePrefix();
 		outputFilePath = "Output/" + datePrefix;
 		mkdir(outputFilePath);
-		
+	}
+	
+	
+	public static Image getResourceImage(String imageName) {
+		return getImage("/resources/" + imageName);
+	}
+	
+	public static Image getImage(String imagePath) {
+		return new Image(imagePath);
 	}
 	
 	public static String getDatePrefix() {
