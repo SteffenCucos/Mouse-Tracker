@@ -1,7 +1,11 @@
-package Main;
+package mousetracker.tracker;
 
 import java.io.FileWriter;
 import java.io.IOException;
+
+import mousetracker.Point;
+import mousetracker.utils.FileUtils;
+import mousetracker.utils.ScreenUtils;
 
 public class FileTracker extends AbstractTracker implements AutoCloseable {
 

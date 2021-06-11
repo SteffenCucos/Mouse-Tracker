@@ -1,4 +1,4 @@
-package Main;
+package mousetracker;
 
 public class Point {
 

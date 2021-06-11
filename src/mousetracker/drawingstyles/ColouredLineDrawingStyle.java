@@ -1,10 +1,10 @@
-package DrawingStyles;
+package mousetracker.drawingstyles;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import Main.Point;
+import mousetracker.Point;
 
 public class ColouredLineDrawingStyle extends AbstractDrawingStyle {
 

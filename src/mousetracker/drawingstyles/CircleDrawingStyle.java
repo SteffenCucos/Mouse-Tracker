@@ -1,15 +1,15 @@
-package DrawingStyles;
+package mousetracker.drawingstyles;
 import java.awt.Color;
 
-import Main.Point;
+import mousetracker.Point;
 
-public class LineDrawingStyle extends AbstractDrawingStyle {
+public class CircleDrawingStyle extends AbstractDrawingStyle {
 
 	Point prevPoint = null;
 	double multiplier = 1;
-
-	public LineDrawingStyle() {
-		super("Line");
+	
+	public CircleDrawingStyle() {
+		super("Circle");
 	}
 	
 	@Override
@@ -28,13 +28,10 @@ public class LineDrawingStyle extends AbstractDrawingStyle {
 			} else {
 				multiplier *= 1.01;
 			}
-			
 		} else {
 			if(multiplier == 1) {
-				if(prevPoint != null) {
-					graphics.setColor(Color.BLACK);
-					graphics.drawLine(point.x, point.y, prevPoint.x, prevPoint.y);
-				}
+				graphics.setColor(Color.BLACK);
+				fillCenteredCircle(point.x, point.y, 3);
 			} else {
 				multiplier = Math.min(multiplier, 20.0);
 
@@ -49,8 +46,9 @@ public class LineDrawingStyle extends AbstractDrawingStyle {
 					fillCenteredCircle(point.x, point.y, 3);
 					fillCenteredCircle(prevPoint.x, prevPoint.y, 3*(int)multiplier);
 				} catch (Exception e) {
-					//
+					e.printStackTrace();
 				}
+
 			}
 			
 			multiplier = 1;

@@ -1,20 +1,10 @@
-package Main;
+package mousetracker;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import Buttons.RenderButton;
-import Buttons.StartTrackingButton;
-import Buttons.StopTrackingButton;
-import DrawingStyles.CircleDrawingStyle;
-import DrawingStyles.ColouredLineDrawingStyle;
-import DrawingStyles.DrawingStyle;
-import DrawingStyles.InvertedNestedDrawingStyle;
-import DrawingStyles.LineDrawingStyle;
-import DrawingStyles.NashornDrawingStyle;
-import DrawingStyles.NestedCircleDrawingStyle;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -24,6 +14,21 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.event.EventHandler;
 import javafx.stage.WindowEvent;
+import mousetracker.buttons.RenderButton;
+import mousetracker.buttons.StartTrackingButton;
+import mousetracker.buttons.StopTrackingButton;
+import mousetracker.drawingstyles.CircleDrawingStyle;
+import mousetracker.drawingstyles.ColouredLineDrawingStyle;
+import mousetracker.drawingstyles.DrawingStyle;
+import mousetracker.drawingstyles.InvertedNestedDrawingStyle;
+import mousetracker.drawingstyles.LineDrawingStyle;
+import mousetracker.drawingstyles.NashornDrawingStyle;
+import mousetracker.drawingstyles.NestedCircleDrawingStyle;
+import mousetracker.tracker.FileTracker;
+import mousetracker.tracker.LiveTracker;
+import mousetracker.tracker.Tracker;
+import mousetracker.utils.FileUtils;
+import mousetracker.utils.ScreenUtils;
 import javafx.scene.control.ProgressBar;
 
 import javafx.beans.value.ChangeListener;

@@ -1,4 +1,4 @@
-package DrawingStyles;
+package mousetracker.drawingstyles;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -7,8 +7,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import Main.FileUtils;
-import Main.Point;
+import mousetracker.Point;
+import mousetracker.utils.FileUtils;
 
 public abstract class AbstractDrawingStyle implements DrawingStyle {
 	

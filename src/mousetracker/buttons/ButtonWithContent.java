@@ -1,4 +1,4 @@
-package Buttons;
+package mousetracker.buttons;
 
 import javafx.scene.Node;
 

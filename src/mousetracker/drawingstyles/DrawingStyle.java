@@ -1,7 +1,7 @@
-package DrawingStyles;
+package mousetracker.drawingstyles;
 import java.io.IOException;
 
-import Main.Point;
+import mousetracker.Point;
 
 public interface DrawingStyle {
 	

@@ -1,4 +1,4 @@
-package Buttons;
+package mousetracker.buttons;
 
 import javafx.scene.control.Button;
 import javafx.event.ActionEvent;

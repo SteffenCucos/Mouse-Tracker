@@ -1,28 +1,27 @@
-package Buttons;
+package mousetracker.buttons;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import DrawingStyles.CircleDrawingStyle;
-import DrawingStyles.ColouredLineDrawingStyle;
-import DrawingStyles.DrawingStyle;
-import DrawingStyles.DrawingStyle.DrawPointException;
-import DrawingStyles.DrawingStyle.DrawingStyleInstantiationException;
-import DrawingStyles.InvertedNestedDrawingStyle;
-import DrawingStyles.LineDrawingStyle;
-import DrawingStyles.NashornDrawingStyle;
-import DrawingStyles.NestedCircleDrawingStyle;
-
-import Main.FileUtils;
-import Main.Point;
-import Main.RenderWindow;
-import Main.ScreenUtils;
-import Main.MouseTracker.ButtonHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tooltip;
+import mousetracker.Point;
+import mousetracker.RenderWindow;
+import mousetracker.MouseTracker.ButtonHandler;
+import mousetracker.drawingstyles.CircleDrawingStyle;
+import mousetracker.drawingstyles.ColouredLineDrawingStyle;
+import mousetracker.drawingstyles.DrawingStyle;
+import mousetracker.drawingstyles.InvertedNestedDrawingStyle;
+import mousetracker.drawingstyles.LineDrawingStyle;
+import mousetracker.drawingstyles.NashornDrawingStyle;
+import mousetracker.drawingstyles.NestedCircleDrawingStyle;
+import mousetracker.drawingstyles.DrawingStyle.DrawPointException;
+import mousetracker.drawingstyles.DrawingStyle.DrawingStyleInstantiationException;
+import mousetracker.utils.FileUtils;
+import mousetracker.utils.ScreenUtils;
 import javafx.event.ActionEvent;
 import javafx.application.Platform;
 

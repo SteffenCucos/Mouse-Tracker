@@ -1,9 +1,9 @@
-package Buttons;
+package mousetracker.buttons;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import Main.RenderWindow;
 import javafx.event.ActionEvent;
+import mousetracker.RenderWindow;
 
 @SuppressWarnings("restriction")
 public class ArrowButton extends TextButton {

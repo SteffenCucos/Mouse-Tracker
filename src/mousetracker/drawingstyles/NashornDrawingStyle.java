@@ -1,4 +1,4 @@
-package DrawingStyles;
+package mousetracker.drawingstyles;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,7 +11,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import Main.Point;
+import mousetracker.Point;
 
 public class NashornDrawingStyle extends AbstractDrawingStyle {
 	

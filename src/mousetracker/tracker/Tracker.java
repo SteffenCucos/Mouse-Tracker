@@ -1,4 +1,6 @@
-package Main;
+package mousetracker.tracker;
+
+import mousetracker.Point;
 
 public interface Tracker {
 	

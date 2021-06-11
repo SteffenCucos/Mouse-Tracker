@@ -1,9 +1,11 @@
-package Main;
+package mousetracker.tracker;
 
 import java.util.List;
 
-import DrawingStyles.DrawingStyle;
-import DrawingStyles.DrawingStyle.DrawPointException;
+import mousetracker.Point;
+import mousetracker.drawingstyles.DrawingStyle;
+import mousetracker.drawingstyles.DrawingStyle.DrawPointException;
+import mousetracker.utils.ScreenUtils;
 
 public class LiveTracker extends AbstractTracker {
 	

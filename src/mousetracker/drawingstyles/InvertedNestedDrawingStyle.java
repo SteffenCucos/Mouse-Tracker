@@ -1,8 +1,8 @@
-package DrawingStyles;
+package mousetracker.drawingstyles;
 
 import java.awt.Color;
 
-import Main.Point;
+import mousetracker.Point;
 
 public class InvertedNestedDrawingStyle extends AbstractDrawingStyle {
 

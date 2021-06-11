@@ -1,10 +1,10 @@
-package Buttons;
+package mousetracker.buttons;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import Main.MouseTracker.ButtonHandler;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import mousetracker.MouseTracker.ButtonHandler;
 
 @SuppressWarnings("restriction")
 public class StopTrackingButton extends IconButton {

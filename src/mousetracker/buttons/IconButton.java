@@ -1,7 +1,7 @@
-package Buttons;
+package mousetracker.buttons;
 
-import Main.FileUtils;
 import javafx.scene.image.ImageView;
+import mousetracker.utils.FileUtils;
 
 @SuppressWarnings("restriction")
 public abstract class IconButton extends ButtonWithContent {

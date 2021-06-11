@@ -1,14 +1,14 @@
-package Buttons;
+package mousetracker.buttons;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import Main.MouseTracker.ButtonHandler;
-import Main.Point;
-import Main.Tracker;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import mousetracker.Point;
+import mousetracker.MouseTracker.ButtonHandler;
+import mousetracker.tracker.Tracker;
 
 import java.awt.MouseInfo;
 

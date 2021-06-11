@@ -1,4 +1,4 @@
-package Main;
+package mousetracker.utils;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
@@ -6,6 +6,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
+
+import mousetracker.Point;
 
 public class ScreenUtils {
 

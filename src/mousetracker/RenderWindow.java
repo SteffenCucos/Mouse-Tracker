@@ -1,21 +1,20 @@
-package Main;
+package mousetracker;
 
 import javafx.scene.control.Button;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
+import mousetracker.buttons.ArrowButton;
+import mousetracker.buttons.ArrowButton.Direction;
+import mousetracker.drawingstyles.AbstractDrawingStyle;
+import mousetracker.drawingstyles.DrawingStyle;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import Buttons.ArrowButton;
-import Buttons.ArrowButton.Direction;
-import DrawingStyles.AbstractDrawingStyle;
-import DrawingStyles.DrawingStyle;
 
 import javafx.scene.image.ImageView;
 
