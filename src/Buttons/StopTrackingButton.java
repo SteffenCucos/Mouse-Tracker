@@ -4,16 +4,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import Main.MouseTracker.ButtonHandler;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 
 @SuppressWarnings("restriction")
-public class StopTrackingButton extends ButtonWithLabel {
+public class StopTrackingButton extends IconButton {
 	
 	static final String NAME = "Stop";
 	AtomicBoolean running;
 	ButtonHandler buttonHandler;
 	
 	public StopTrackingButton(Label messageLabel, AtomicBoolean running, ButtonHandler buttonHandler) {
-		super(NAME, messageLabel);
+		super("stopIcon16.png");
+		this.setTooltip(new Tooltip("Stop Tracking"));
 		this.running = running;
 		this.buttonHandler = buttonHandler;
 	}
@@ -23,7 +25,6 @@ public class StopTrackingButton extends ButtonWithLabel {
     	buttonHandler.renderFinsish();
     	if(running.get()) {
     		running.set(false);
-    		setLabelMessage("Stopped");
     	}
     }
 }

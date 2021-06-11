@@ -6,7 +6,7 @@ import Main.RenderWindow;
 import javafx.event.ActionEvent;
 
 @SuppressWarnings("restriction")
-public class ArrowButton extends EventHandlerButton {
+public class ArrowButton extends TextButton {
 
 	public enum Direction { 
 		LEFT, 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import Buttons.RenderButton;
 import Buttons.StartTrackingButton;
 import Buttons.StopTrackingButton;
 import DrawingStyles.CircleDrawingStyle;
@@ -23,6 +24,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.event.EventHandler;
 import javafx.stage.WindowEvent;
+import javafx.scene.control.ProgressBar;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -40,6 +42,9 @@ public class MouseTracker extends Application {
 	@SuppressWarnings("serial")
 	@Override
 	public void start(Stage stage) throws Exception {
+		final ProgressBar progressBar = new ProgressBar(0);
+		
+		
         ButtonHandler buttonHandler = new ButtonHandler();
         
 		List<DrawingStyle> drawingStyles = new ArrayList<DrawingStyle>() {{
@@ -56,22 +61,27 @@ public class MouseTracker extends Application {
 			add(new LiveTracker(drawingStyles));
 		}};
 		
-        Button startButton = new StartTrackingButton(messageLabel, running, buttonHandler, trackers); 
-        Button stopButton = new StopTrackingButton(messageLabel, running, buttonHandler); 
+        Button startButton = new StartTrackingButton(messageLabel, running, buttonHandler, trackers);
+        Button stopButton = new StopTrackingButton(messageLabel, running, buttonHandler);
+        Button renderButton = new RenderButton(messageLabel, running, buttonHandler, progressBar);
         
-        buttonHandler.init(startButton, stopButton);
+        buttonHandler.init(startButton, stopButton, renderButton);
         
         // Create the HBox
         HBox buttonBox = new HBox();
-        buttonBox.getChildren().addAll(startButton, stopButton);
+        buttonBox.getChildren().addAll(startButton, stopButton, renderButton, progressBar);
         buttonBox.setSpacing(15);
+        buttonBox.setStyle("-fx-padding: 10;" + "-fx-border-style: solid inside;"
+                + "-fx-border-width: 2;" + "-fx-border-insets: 5;"
+                + "-fx-border-radius: 5;" + "-fx-border-color: grey;"
+        );
          
         // Create the VBox
         VBox root = new VBox();
         root.getChildren().addAll(buttonBox);
         root.setSpacing(15);
         root.setStyle(
-        		"-fx-padding: 10;" +
+        		//"-fx-padding: 10;" +
                 "-fx-base: #3f474f;\r\n" + 
                 "    -fx-accent: #e7eff7 ;\r\n" + 
                 "    -fx-default-button: #7f878f ;\r\n" + 
@@ -92,6 +102,7 @@ public class MouseTracker extends Application {
         }
 		
         RenderWindow renderWindow = RenderWindow.buildRenderWindow(drawingStyles, ScreenUtils.dimensions);
+        
         
         new Thread(() -> {
 			while(true) {
@@ -134,7 +145,7 @@ public class MouseTracker extends Application {
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
             	Set<Thread> threads = Thread.getAllStackTraces().keySet();
-            	 
+            	
             	for (Thread t : threads) {
             	    String name = t.getName();
             	    Thread.State state = t.getState();
@@ -146,17 +157,18 @@ public class MouseTracker extends Application {
             }
         });  
         
-        
         stage.show();
     }
 	
 	public static class ButtonHandler {
 		Button startButton;
 		Button stopButton;
+		Button renderButton;
 		
-		public void init(Button startButton, Button stopButton) {
+		public void init(Button startButton, Button stopButton, Button renderButton) {
 			this.startButton = startButton;
 			this.stopButton = stopButton;
+			this.renderButton = renderButton;
 			enableAll();
 			this.stopButton.setDisable(true);
 		}
@@ -164,17 +176,21 @@ public class MouseTracker extends Application {
 		public void enableAll() {
 			startButton.setDisable(false);
 			stopButton.setDisable(false);
+			renderButton.setDisable(false);
 		}
 		
 		public void pressButton(Button button) {
 			enableAll();
 			if(button == startButton) {
 				startButton.setDisable(true);
+				renderButton.setDisable(true);
 			} else if(button ==  stopButton) {
 				stopButton.setDisable(true);
+				renderButton.setDisable(true);
 			} else {
 				startButton.setDisable(true);
 				stopButton.setDisable(true);
+				renderButton.setDisable(true);
 			}
 		}
 		

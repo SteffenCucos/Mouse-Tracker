@@ -7,11 +7,7 @@ import javafx.event.EventHandler;
 @SuppressWarnings("restriction")
 public abstract class EventHandlerButton extends Button implements EventHandler<ActionEvent>  {
 
-	String name;
-	
-	public EventHandlerButton(String name) {
-		super(name);
-		this.name = name;
+	public EventHandlerButton() {
 		this.setOnAction(this);
 	}
 }

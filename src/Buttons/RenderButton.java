@@ -22,6 +22,7 @@ import Main.ScreenUtils;
 import Main.MouseTracker.ButtonHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tooltip;
 import javafx.event.ActionEvent;
 import javafx.application.Platform;
 
@@ -31,7 +32,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 @SuppressWarnings("restriction")
-public class RenderButton extends ButtonWithLabel {
+public class RenderButton extends TextButton {
 	
 	static final String NAME = "Render";
 	AtomicBoolean running;
@@ -39,7 +40,8 @@ public class RenderButton extends ButtonWithLabel {
 	ProgressBar progressBar;
 	
 	public RenderButton(Label messageLabel, AtomicBoolean running, ButtonHandler buttonHandler, ProgressBar progressBar) throws IOException {
-		super(NAME, messageLabel);
+		super(NAME);
+		this.setTooltip(new Tooltip("Render"));
 		this.running = running;
 		this.buttonHandler = buttonHandler;
 		this.progressBar = progressBar;
@@ -49,7 +51,6 @@ public class RenderButton extends ButtonWithLabel {
     public void handle(ActionEvent event) {
     	buttonHandler.pressButton(this);
     	if(!running.get()) {
-			setLabelMessage("Rendering");
 			renderMarshallingThread().start();
     	}
     }

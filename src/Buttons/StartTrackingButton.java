@@ -8,11 +8,12 @@ import Main.Point;
 import Main.Tracker;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 
 import java.awt.MouseInfo;
 
 @SuppressWarnings("restriction")
-public class StartTrackingButton extends ButtonWithLabel {
+public class StartTrackingButton extends IconButton {
 	
 	static final String NAME = "Start";
 	AtomicBoolean running;
@@ -22,7 +23,8 @@ public class StartTrackingButton extends ButtonWithLabel {
 
 	
 	public StartTrackingButton(Label messageLabel, AtomicBoolean running, ButtonHandler buttonHandler, List<Tracker> trackers) {
-		super(NAME, messageLabel);
+		super("startIcon16.png");
+		this.setTooltip(new Tooltip("Start Tracking"));
 		this.running = running;
 		this.buttonHandler = buttonHandler;
 		this.trackers = trackers;
@@ -33,7 +35,6 @@ public class StartTrackingButton extends ButtonWithLabel {
     	buttonHandler.pressButton(this);
     	if(!running.get()) {
     		running.set(true);
-    		setLabelMessage("Started");
 			trackingThread().start();
     	}
     }

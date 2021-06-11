@@ -3,11 +3,8 @@ package Main;
 import javafx.scene.control.Button;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -36,13 +33,6 @@ public class RenderWindow extends HBox {
 	Button right;
 	
 	public static Point computePreservedSize(Point boundingBox, Point dimensions) {
-		double width;
-		double height;
-		
-		double dimensionsWidthHeightRatio = (double)dimensions.x / dimensions.y;
-		
-		
-
 		//scaling factor	
 		double vScale = (double)boundingBox.y/dimensions.y;
 		double hScale = (double)boundingBox.x/dimensions.x;
@@ -101,30 +91,15 @@ public class RenderWindow extends HBox {
 		
 		this.heightProperty().addListener(new ChangeListener<Object>() {
 			public void changed(ObservableValue<?> observable, Object oldValue, Object newValue) {
-//				Point newDimensions = computePreservedSize(
-//						new Point((int)that.getWidth(), ((Double)newValue).intValue()),
-//						imageDimensions);
-//				
-//				imageView.setFitWidth(newDimensions.x - 100);
-//				imageView.setFitHeight(newDimensions.y - 100);
 				imageView.setFitHeight((double) newValue - 20);
 			}
   		});
 		
 		this.widthProperty().addListener(new ChangeListener<Object>() {
     	  public void changed(ObservableValue<?> observable, Object oldValue, Object newValue) {
-//				Point newDimensions = computePreservedSize(
-//						new Point(((Double)newValue).intValue(), (int)that.getHeight()),
-//						imageDimensions);
-//				
-//				imageView.setFitWidth(newDimensions.x - 100);
-//				imageView.setFitHeight(newDimensions.y - 100);
     		  imageView.setFitWidth((double) newValue - 100);
 			}
   		});
-		
-
-		
 		
 		setButtons(true);
 		drawRender();

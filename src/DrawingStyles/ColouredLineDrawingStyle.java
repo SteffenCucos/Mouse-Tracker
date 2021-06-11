@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import DrawingStyles.DrawingStyle.DrawingStyleInstantiationException;
 import Main.Point;
 
 public class ColouredLineDrawingStyle extends AbstractDrawingStyle {
