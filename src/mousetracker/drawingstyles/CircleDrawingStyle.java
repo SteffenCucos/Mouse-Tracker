@@ -1,5 +1,6 @@
 package mousetracker.drawingstyles;
 import java.awt.Color;
+import java.awt.Font;
 
 import mousetracker.Point;
 
@@ -18,10 +19,21 @@ public class CircleDrawingStyle extends AbstractDrawingStyle {
 		graphics.setColor(Color.WHITE);
 		graphics.fillRect (0, 0, image.getWidth(), image.getHeight());
 		graphics.setColor(Color.BLACK);
+		graphics.setFont(new Font("TimesRoman", Font.PLAIN, 40)); 
+		graphics.setColor(Color.WHITE);
+		graphics.fillRect(0, 0, 600, 50);
+		graphics.setColor(Color.BLACK);
+		graphics.drawString(getCurrentTimeStamp(), 50, 50);
 	}
 	
 	@Override
 	public void drawPoint(Point point) throws DrawPointException {
+		
+		graphics.setColor(Color.WHITE);
+		graphics.fillRect(0, 50, 600, 50);
+		graphics.setColor(Color.BLACK);
+		graphics.drawString(getCurrentTimeStamp(), 50, 100);
+		
 		if(point.equals(prevPoint)) {
 			if(multiplier > 20) {
 				multiplier *= 1.005;

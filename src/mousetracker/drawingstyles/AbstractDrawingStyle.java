@@ -4,6 +4,8 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 
@@ -65,5 +67,9 @@ public abstract class AbstractDrawingStyle implements DrawingStyle {
 		int cy = y - r/2;
 		
 		graphics.drawOval(cx, cy, r, r);
+	}
+	
+	public String getCurrentTimeStamp() {
+	    return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
 	}
 }

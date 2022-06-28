@@ -50,6 +50,10 @@ public class RenderButton extends TextButton {
     public void handle(ActionEvent event) {
     	buttonHandler.pressButton(this);
     	if(!running.get()) {
+    		
+    		
+    		
+    		
 			renderMarshallingThread().start();
     	}
     }
@@ -140,12 +144,22 @@ public class RenderButton extends TextButton {
 			
 			progressBar.setProgress(1);
 			
+			for(DrawingStyle ds : drawingStyles) {
+				try {
+					ds.saveDrawing();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			
 			Platform.runLater(() -> {
 				try {
 					buttonHandler.renderFinsish();
 					try(BufferedReader reader = new BufferedReader(new FileReader(pointsFile))) {
 						Point dimensions = Point.from(reader.readLine());
-						RenderWindow.buildRenderWindow(drawingStyles, dimensions);
+						//RenderWindow.buildRenderWindow(drawingStyles, dimensions);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

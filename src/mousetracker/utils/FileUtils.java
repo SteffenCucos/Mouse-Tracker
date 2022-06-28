@@ -1,5 +1,6 @@
 package mousetracker.utils;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -25,6 +26,10 @@ public class FileUtils {
 		mkdir(outputFilePath);
 	}
 	
+	public static BufferedImage getResourceBufferedImage(String imageName) {
+		Image image = getResourceImage(imageName);
+		return javafx.embed.swing.SwingFXUtils.fromFXImage(image, null);
+	}
 	
 	public static Image getResourceImage(String imageName) {
 		return getImage("/resources/" + imageName);

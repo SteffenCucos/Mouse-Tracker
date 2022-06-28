@@ -17,6 +17,7 @@ import javafx.stage.WindowEvent;
 import mousetracker.buttons.RenderButton;
 import mousetracker.buttons.StartTrackingButton;
 import mousetracker.buttons.StopTrackingButton;
+import mousetracker.drawingstyles.BackgroundImageDrawingStyle;
 import mousetracker.drawingstyles.CircleDrawingStyle;
 import mousetracker.drawingstyles.ColouredLineDrawingStyle;
 import mousetracker.drawingstyles.DrawingStyle;
@@ -33,13 +34,13 @@ import javafx.scene.control.ProgressBar;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
- 
+
 @SuppressWarnings("restriction")
 public class MouseTracker extends Application {
 
 	final Label messageLabel = new Label("Press any Button");
-    final AtomicBoolean running = new AtomicBoolean(false);
-    
+	final AtomicBoolean running = new AtomicBoolean(false);
+
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
@@ -49,7 +50,6 @@ public class MouseTracker extends Application {
 	public void start(Stage stage) throws Exception {
 		final ProgressBar progressBar = new ProgressBar(0);
 		
-		
         ButtonHandler buttonHandler = new ButtonHandler();
         
 		List<DrawingStyle> drawingStyles = new ArrayList<DrawingStyle>() {{
@@ -58,6 +58,7 @@ public class MouseTracker extends Application {
 			add(new ColouredLineDrawingStyle());
 			add(new NestedCircleDrawingStyle());
 			add(new InvertedNestedDrawingStyle());
+			add(new BackgroundImageDrawingStyle(FileUtils.getResourceBufferedImage("steffen.png")));
 			addAll(NashornDrawingStyle.getCustomDrawingStyles());
 		}};
 		
@@ -106,25 +107,12 @@ public class MouseTracker extends Application {
         	ds.init(ScreenUtils.dimensions);
         }
 		
-        RenderWindow renderWindow = RenderWindow.buildRenderWindow(drawingStyles, ScreenUtils.dimensions);
+        Label drawingName = new Label();
+        RenderWindow renderWindow = RenderWindow.buildRenderWindow(drawingStyles, drawingName, ScreenUtils.dimensions);
         
-        
-        new Thread(() -> {
-			while(true) {
-				try {
-					Thread.sleep(1);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				renderWindow.drawRender();
-			}
-		}).start();
-        
-        
-		root.getChildren().add(renderWindow);
-        
+		root.getChildren().addAll(drawingName, renderWindow);
+		root.setAlignment(javafx.geometry.Pos.CENTER);
+		
 		root.heightProperty().addListener(new ChangeListener<Object>() {
       	  public void changed(ObservableValue<?> observable, Object oldValue, Object newValue) {
   		    renderWindow.setPrefHeight((double) newValue);
@@ -160,16 +148,32 @@ public class MouseTracker extends Application {
             	    t.interrupt();
             	}
             }
-        });  
+        }); 
+        
+        new Thread(() -> {
+			while(true) {
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				synchronized(renderWindow) {
+					renderWindow.drawRender();
+				}	
+			}
+		}) {{
+			setName("Refresh Window Thread");
+		}}.start();
         
         stage.show();
     }
-	
+
 	public static class ButtonHandler {
 		Button startButton;
 		Button stopButton;
 		Button renderButton;
-		
+
 		public void init(Button startButton, Button stopButton, Button renderButton) {
 			this.startButton = startButton;
 			this.stopButton = stopButton;
@@ -177,19 +181,19 @@ public class MouseTracker extends Application {
 			enableAll();
 			this.stopButton.setDisable(true);
 		}
-		
+
 		public void enableAll() {
 			startButton.setDisable(false);
 			stopButton.setDisable(false);
 			renderButton.setDisable(false);
 		}
-		
+
 		public void pressButton(Button button) {
 			enableAll();
-			if(button == startButton) {
+			if (button == startButton) {
 				startButton.setDisable(true);
 				renderButton.setDisable(true);
-			} else if(button ==  stopButton) {
+			} else if (button == stopButton) {
 				stopButton.setDisable(true);
 				renderButton.setDisable(true);
 			} else {
@@ -198,7 +202,7 @@ public class MouseTracker extends Application {
 				renderButton.setDisable(true);
 			}
 		}
-		
+
 		public void renderFinsish() {
 			enableAll();
 			stopButton.setDisable(true);

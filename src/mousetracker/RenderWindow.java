@@ -5,6 +5,9 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.control.Label;
+
 import mousetracker.buttons.ArrowButton;
 import mousetracker.buttons.ArrowButton.Direction;
 import mousetracker.drawingstyles.AbstractDrawingStyle;
@@ -14,16 +17,15 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
 import javafx.scene.image.ImageView;
 
 @SuppressWarnings("restriction")
 public class RenderWindow extends HBox {
 
-	AtomicInteger index = new AtomicInteger(0);
-	List<BufferedImage> renders = new ArrayList<>();
+	public AtomicInteger index = new AtomicInteger(0);
+	List<DrawingStyle> drawingStyles = new ArrayList<>();
 	ImageView imageView = new ImageView();
+	Label drawingName;
 	
 	double width;
 	double height;
@@ -43,7 +45,7 @@ public class RenderWindow extends HBox {
 		return new Point((int)(dimensions.x * scalingFactor), (int)(dimensions.y * scalingFactor));
 	}
 	
-	public static RenderWindow buildRenderWindow(List<DrawingStyle> drawingStyles, Point dimensions) throws Exception {
+	public static RenderWindow buildRenderWindow(List<DrawingStyle> drawingStyles, Label drawingName, Point dimensions) throws Exception {
 		double width;
 		double height;
 		
@@ -59,30 +61,27 @@ public class RenderWindow extends HBox {
 		
 		Point preservedDimensions = computePreservedSize(new Point(800,800), dimensions);
 		
-		List<BufferedImage> renders = drawingStyles
-				.stream()
-				.map(ds -> (AbstractDrawingStyle)ds)
-				.map(ads -> ads.image)
-				.collect(Collectors.toList());
-		
-		RenderWindow renderWindow = new RenderWindow(renders, preservedDimensions.x, preservedDimensions.y, dimensions);
-		
-		return renderWindow;
+		return new RenderWindow(drawingStyles, drawingName, preservedDimensions.x, preservedDimensions.y, dimensions);
 	}
 	
-	private RenderWindow(List<BufferedImage> renders, double width, double height, Point imageDimensions) {
-		this.renders = renders;
+	private DrawingStyle getSelectedDrawingStyle() {
+		return drawingStyles.get(index.get());
+	}
+	
+	private RenderWindow(List<DrawingStyle> drawingStyles, Label drawingName, double width, double height, Point imageDimensions) {
+		this.drawingStyles = drawingStyles;
+		this.drawingName = drawingName;
 		
 		int start = 0;
-		int end = renders.size() - 1;
+		int end = drawingStyles.size() - 1;
 
 		this.left = new ArrowButton("<", Direction.LEFT, start, end, index, this);
 		this.right = new ArrowButton(">", Direction.RIGHT, start, end, index, this);
-
+		
 		this.getChildren().addAll(left, imageView, right);
-		this.setSpacing(10);
-
 		this.setAlignment(javafx.geometry.Pos.CENTER);
+		this.setSpacing(10);
+		
         
 		imageView.setPreserveRatio(true);
 		imageView.setFitWidth(width);
@@ -105,9 +104,11 @@ public class RenderWindow extends HBox {
 	}
 	
 	public void drawRender() {
-		BufferedImage bufferedImage = renders.get(index.get());
+		DrawingStyle ds = getSelectedDrawingStyle();
+		BufferedImage bufferedImage = ((AbstractDrawingStyle)ds).image;
 		Image image = javafx.embed.swing.SwingFXUtils.toFXImage(bufferedImage, null);
 		imageView.setImage(image);
+		drawingName.setText(ds.getName());
 	}
 	
 	public void setButtons(boolean enabled) {

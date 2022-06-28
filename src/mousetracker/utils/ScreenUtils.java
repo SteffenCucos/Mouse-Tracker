@@ -1,9 +1,11 @@
 package mousetracker.utils;
 
+import java.awt.Color;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +85,40 @@ public class ScreenUtils {
 	public static Point renderPoint(Point point, Point offset) {
 		point.x += offset.x;
 		point.y += offset.y;
+		
+		return point;
+	}
+	
+	public static Color getColor(BufferedImage image, Point point) {
+		int clr = image.getRGB(point.x, point.y);
+        int red =   (clr & 0x00ff0000) >> 16;
+        int green = (clr & 0x0000ff00) >> 8;
+        int blue =   clr & 0x000000ff;
+        
+        return new Color(red, green, blue);
+	}
+
+	public static Point renderPoint2(Point point, Point offset, int iteration) {
+		if(iteration % 4 == 0) {
+			return renderPoint(point, offset);
+		} else if (iteration % 4 == 1) {
+			point.x = (point.x + offset.x * iteration) % dimensions.x;
+			point.y = (-(point.y + offset.y * iteration)) % dimensions.y;
+		} else if (iteration % 4  == 3) {
+			point.x = (-(point.x + offset.x)) % dimensions.x;
+			point.y = (point.y + offset.y * iteration) % dimensions.y;
+		} else {
+			point.x = (-(point.x + offset.x * iteration)) % dimensions.x;
+			point.y = (-(point.y + offset.y)) % dimensions.y;
+		}
+		
+		if(point.y < 0) {
+			point.y *= -1;
+		}
+		
+		if(point.x < 0) {
+			point.x *= -1;
+		}
 		
 		return point;
 	}

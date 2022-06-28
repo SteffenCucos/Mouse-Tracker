@@ -48,6 +48,8 @@ public class ArrowButton extends TextButton {
 				index.set(start);
 			}
 		}
-		window.drawRender();
+		synchronized(window) {
+			window.drawRender();
+		}	
 	}
 }
